@@ -3,13 +3,14 @@ package com.mst.dtnserver;
 import com.mst.karsac.Roger.RogerIp;
 import com.mst.karsac.connections.ImageMessage;
 import com.mst.karsac.messages.Messages;
+import com.mst.karsac.ratings.MessageRatings;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Calendar;
+import java.util.List;
 
 public class ServerJava {
 
@@ -55,7 +56,25 @@ public class ServerJava {
                         writer.println("Incentive Paid:" + img_msg.incentive_paid);
                         writer.println("Incentive received:" + img_msg.incentive_received);
                         writer.println("Incentive promised:" + img_msg.incentive_promised);
-                        writer.println("intermediaries separated by |:" + img_msg.destAddr);
+                        writer.println("intermediaries separated by \"|\" :" + img_msg.destAddr);
+                        writer.println("-------Ratings for this message----------");
+
+                        List<MessageRatings> messageRatings = imageMessage.messageRatings;
+                        for(MessageRatings ratings : messageRatings){
+                            writer.println("Unique_id: " + ratings.getIntermediary());
+                            String type = ratings.getInter_type();
+                            writer.println("Type: " + type);
+                            writer.println("Tag rate: " + ratings.getTag_rate());
+                            writer.println("Confidence rate: " + ratings.getConfidence_rate());
+                            if(type.contains("Source")){
+                                writer.println("Quality rate: " + ratings.getQuality_rate());
+                            }
+                            writer.println("-----------------------------------------");
+                        }
+                        if(messageRatings.size() == 0) {
+                            writer.println("No ratings added for this message!");
+                            writer.println("-----------------------------------------");
+                        }
                         writer.close();
                         String img_path = date_path + img_msg.uuid + ".jpg";
                         File img_file = new File(img_path);
